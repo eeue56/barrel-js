@@ -1,0 +1,22 @@
+{
+  "name": "barrel-js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/eeue56/barrel-js",
+  "authors": [
+    "eeue56 <eep41b@bangor.ac.uk>"
+  ],
+  "description": "Angular library for interacting with Barrel",
+  "main": "barrel.js",
+  "keywords": [
+    "angular",
+    "barrel"
+  ],
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
