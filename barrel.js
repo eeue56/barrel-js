@@ -1,14 +1,18 @@
 angular.module('barrel', [])
 
-.service('Barrel', function() {
+.constant('BarrelKey', 
+  'barrel'
+)
+
+
+.service('BarrelUtils', function(BarrelKey) {
   this.store = null;
-  var BARREL_KEY = 'barrel';
 
   this.init = function() {
-    var store = localStorage.getItem(BARREL_KEY);
+    var store = localStorage.getItem(BarrelKey);
 
     if (!store) {
-      localStorage.setItem(BARREL_KEY, '');
+      localStorage.setItem(BarrelKey, '');
       store = {};
     } else {
       store = JSON.parse(store);
@@ -20,35 +24,46 @@ angular.module('barrel', [])
   this.init();
 
   this._store = function() {
-    localStorage.setItem(BARREL_KEY, JSON.stringify(this.store));
-  };
-
-  this.child = function(id) {
-    return this.store[id] || new BarrelObject(id);
+    localStorage.setItem(BarrelKey, JSON.stringify(this.store));
   };
 
   this.save = function(id, item) {
     this.store[id] = item;
     this._store();
   };    
+})
+
+
+.service('Barrel', function(BarrelObject) {
+    
+  this.child = function(id) {
+    return BarrelObject(id);
+  };
 
 })
 
-.factory('BarrelObject', function(Barrel) {
+
+.factory('BarrelObject', function(BarrelUtils) {
   function BarrelObject(id) {
     if(!(this instanceof BarrelObject)) {
       return new BarrelObject(id);
     }
 
     this.$id = id;
+
+    this._innerArray = [];
   };
 
   BarrelObject.prototype = {
+    $update: function(value) {
+      this._innerArray = value;
+      this.$save();
+    },
     $save: function() {
-      Barrel.save(this.$id, this);
+      BarrelUtils.save(this.$id, this);
     },
     $push: function(object) {
-
+      this._innerArray.push(object);
     }
   };
 
