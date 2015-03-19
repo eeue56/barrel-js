@@ -56,27 +56,57 @@ angular.module('barrel', [])
 
     this.$id = id;
 
-    this._innerArray = [];
+
+    this._conf = {
+      innerArray: [],
+      listeners: []
+    };
 
     var me = BarrelUtils.get(id); 
 
     if (me !== null){
-      this._innerArray = me._innerArray;      
+      this._conf.innerArray = me._conf.innerArray;      
     }
   };
 
   BarrelObject.prototype = {
     $update: function(value) {
-      this._innerArray = value;
+      this._conf.innerArray = value;
     },
     $save: function() {
       BarrelUtils.save(this.$id, this);
     },
+    $watch: function(cb, context) {
+      var list = this._conf.listeners;
+      list.push([cb, context]);
+
+      return function() {
+        var i = list.findIndex(function(parts){
+          return parts[0] === cb && parts[1] = context;
+        });
+
+        if (i > -1) {
+          list.splice(i, 1);
+        }
+      };
+    },
     $push: function(object) {
-      this._innerArray.push(object);
+      this._conf.innerArray.push(object);
     },
     $asArray: function() {
-      return this._innerArray;
+      return this._conf.innerArray;
+    },
+    $$notify: function() {
+      var self = this;
+
+      var list = this._conf.listeners.slice();
+
+      angular.forEach(list, function(parts) {
+        parts[0].call(parts[1], { 
+          event: 'value',
+          key: self.$id
+        });
+      });
     }
   };
 
